@@ -61,8 +61,7 @@
 
 <div class="container">
     <h2>🔬 Extrator de Exames Laboratoriais</h2>
-    <p>Carregue a foto do seu exame e defina o padrão que a IA deve seguir para formatar o resultado.</p>
-    
+        
     <hr>
 
     <!-- Configurações da API -->
@@ -80,24 +79,23 @@
 
     <!-- Definição do Padrão -->
     <div class="form-group">
-        <label for="padraoTexto">Defina o Padrão do Texto de Saída:</label>
-        <textarea id="padraoTexto" rows="8">
+       <textarea id="padraoTexto" rows="8">
 =========================================
 📝 RELATÓRIO DE EXAMES DE ROTINA [DD/MM/AAAA]
 =========================================
 
 🩸 SÉRIE VERMELHA E BRANCA (Hemograma)
-- Hb (Hemoglobina): [Valor] [Unidade] (Ref: [Referência])
-- Ht (Hematócrito): [Valor] [Unidade] (Ref: [Referência])
-- VCM: [Valor] [Unidade] (Ref: [Referência])
-- HCM: [Valor] [Unidade] (Ref: [Referência])
-- Leuco (Leucócitos): [Valor] [Unidade] (Ref: [Referência])
-- Plaq (Plaquetas): [Valor] [Unidade] (Ref: [Referência])
+- Hb: [Valor] [Unidade] 
+- Ht: [Valor] [Unidade] 
+- VCM: [Valor] [Unidade] 
+- HCM: [Valor] [Unidade] 
+- Leuco: [Valor] [Unidade] 
+- Plaq: [Valor] [Unidade] 
 
 🔩 PERFIL DE FERRO
-- Fe (Ferro Sérico): [Valor] [Unidade] (Ref: [Referência])
+- Fe: [Valor] [Unidade] (Ref: [Referência])
 - Ferritina: [Valor] [Unidade] (Ref: [Referência])
-- TIBC (Capacidade de Ligação do Ferro): [Valor] [Unidade] (Ref: [Referência])
+- TIBC: [Valor] [Unidade] (Ref: [Referência])
 
 💊 VITAMINAS
 - Vitamina B12: [Valor] [Unidade] (Ref: [Referência])
@@ -106,42 +104,42 @@
 - Vitamina C: [Valor] [Unidade] (Ref: [Referência])
 
 🍬 PERFIL GLICÊMICO
-- Glic (Glicemia de Jejum): [Valor] [Unidade] (Ref: [Referência])
-- HbA1c (Hemoglobina Glicada): [Valor] [Unidade] (Ref: [Referência])
+- Glicose: [Valor] [Unidade] (Ref: [Referência])
+- HbA1c: [Valor] [Unidade] (Ref: [Referência])
 
 🥑 PERFIL LIPÍDICO
-- CT (Colesterol Total): [Valor] [Unidade] (Ref: [Referência])
+- CT: [Valor] [Unidade] (Ref: [Referência])
 - HDL: [Valor] [Unidade] (Ref: [Referência])
 - LDL: [Valor] [Unidade] (Ref: [Referência])
 - Não-HDL: [Valor] [Unidade] (Ref: [Referência])
 - VLDL: [Valor] [Unidade] (Ref: [Referência])
-- TG (Triglicerídeos): [Valor] [Unidade] (Ref: [Referência])
+- TG: [Valor] [Unidade] (Ref: [Referência])
 
 🦋 TIREOIDE
 - TSH: [Valor] [Unidade] (Ref: [Referência])
-- T4L (T4 Livre): [Valor] [Unidade] (Ref: [Referência])
+- T4L: [Valor] [Unidade] (Ref: [Referência])
 
 🍏 FUNÇÃO HEPÁTICA
 - TGO (AST): [Valor] [Unidade] (Ref: [Referência])
 - TGP (ALT): [Valor] [Unidade] (Ref: [Referência])
 
 💧 FUNÇÃO RENAL
-- Ur (Ureia): [Valor] [Unidade] (Ref: [Referência])
-- Cr (Creatinina): [Valor] [Unidade] (Ref: [Referência])
+- Ur: [Valor] [Unidade] (Ref: [Referência])
+- Cr: [Valor] [Unidade] (Ref: [Referência])
 
 🔥 MARCADORES INFLAMATÓRIOS / ENZIMAS
-- LDH (Desidrogenase Lática): [Valor] [Unidade] (Ref: [Referência])
-- VHS (Velocidade de Hemossedimentação): [Valor] [Unidade] (Ref: [Referência])
-- PCR (Proteína C Reativa): [Valor] [Unidade] (Ref: [Referência])
+- LDH: [Valor] [Unidade] (Ref: [Referência])
+- VHS: [Valor] [Unidade] (Ref: [Referência])
+- PCR: [Valor] [Unidade] (Ref: [Referência])
 
 🧂 ELETRÓLITOS E MINERAIS
-- Na (Sódio): [Valor] [Unidade] (Ref: [Referência])
-- K (Potássio): [Valor] [Unidade] (Ref: [Referência])
-- Cai (Cálcio Iônico): [Valor] [Unidade] (Ref: [Referência])
-- Zn (Zinco): [Valor] [Unidade] (Ref: [Referência])
-- Mg (Magnésio): [Valor] [Unidade] (Ref: [Referência])
-- P (Fósforo): [Valor] [Unidade] (Ref: [Referência])
-- Cl (Cloro): [Valor] [Unidade] (Ref: [Referência])
+- Na: [Valor] [Unidade] (Ref: [Referência])
+- K: [Valor] [Unidade] (Ref: [Referência])
+- Cai: [Valor] [Unidade] (Ref: [Referência])
+- Zn: [Valor] [Unidade] (Ref: [Referência])
+- Mg: [Valor] [Unidade] (Ref: [Referência])
+- P: [Valor] [Unidade] (Ref: [Referência])
+- Cl: [Valor] [Unidade] (Ref: [Referência])
 
 💩 EXAME DE FEZES
 - Resultados principais: [Resumo dos achados/Parasitológico]
