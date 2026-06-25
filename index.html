@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de Exames Inteligente</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 { color: #2c3e50; margin-top: 0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+        input[type="file"] { margin-top: 5px; }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-left: 5px solid #27ae60;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            display: none;
+        }
+        .loading { display: none; color: #e67e22; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔬 Extrator de Exames Laboratoriais</h2>
+    <p>Carregue a foto do seu exame e defina o padrão que a IA deve seguir para formatar o resultado.</p>
+    
+    <hr>
+
+    <!-- Configurações da API -->
+    <div class="form-group">
+        <label for="apiKey">Sua API Key do Google AI Studio:</label>
+        <input type="text" id="apiKey" placeholder="Cole sua AI_KEY aqui..." value="">
+        <small style="color: #7f8c8d;">Pegue uma chave gratuita no Google AI Studio se não tiver.</small>
+    </div>
+
+    <!-- Upload do Arquivo -->
+    <div class="form-group">
+        <label for="exameFile">Selecione a Imagem do Exame (PNG/JPG):</label>
+        <input type="file" id="exameFile" accept="image/*">
+    </div>
+
+    <!-- Definição do Padrão -->
+    <div class="form-group">
+        <label for="padraoTexto">Defina o Padrão do Texto de Saída:</label>
+        <textarea id="padraoTexto" rows="8">
+Exame: [Nome do Exame]
+Paciente: [Nome do Paciente]
+Data: [DD/MM/AAAA]
+
+Resultados:
+- [Nome do parâmetro]: [Valor encontrado] [Unidade] (Ref: [Valor de Referência])
+        </textarea>
+    </div>
+
+    <!-- Botão de Ação -->
+    <button id="btnProcessar" onclick="processarExame()">Processar Exame com Gemini 2.5</button>
+    <div id="loadingText" class="loading">⏳ Lendo o exame e formatando os dados... Aguarde...</div>
+
+    <!-- Área de Resultado -->
+    <div id="output"></div>
+</div>
+
+<!-- Importação do SDK oficial do Google Gen AI via ESM -->
+<script type="module">
+    import { GoogleGenAI } from 'https://esm.run/@google/genai';
+
+    // Tornando a função acessível globalmente no botão do HTML
+    window.processarExame = async function() {
+        const apiKey = document.getElementById('apiKey').value.trim();
+        const fileInput = document.getElementById('exameFile');
+        const padrao = document.getElementById('padraoTexto').value;
+        const outputDiv = document.getElementById('output');
+        const loadingText = document.getElementById('loadingText');
+        const btn = document.getElementById('btnProcessar');
+
+        if (!apiKey) {
+            alert('Por favor, insira sua API Key do Google.');
+            return;
+        }
+        if (fileInput.files.length === 0) {
+            alert('Por favor, selecione a foto de um exame.');
+            return;
+        }
+
+        try {
+            // Interface visual de carregamento
+            btn.disabled = true;
+            loadingText.style.display = 'block';
+            outputDiv.style.display = 'none';
+
+            // 1. Inicializa o cliente do Gemini
+            const ai = new GoogleGenAI({ apiKey: apiKey });
+            const file = fileInput.files[0];
+
+            // 2. Converte a imagem carregada para o formato Base64 que a API exige
+            const base64Data = await fileToGenerativePart(file);
+
+            // 3. Monta as instruções do sistema e o prompt do usuário
+            const instrucaoSistema = 
+                "Você é um assistente médico especialista em transcrição de laudos laboratoriais. " +
+                "Sua única tarefa é extrair os dados do exame e formatá-los rigorosamente no padrão " +
+                "enviado pelo usuário. Não invente dados e não faça comentários adicionais.";
+
+            const promptUsuario = `Extraia os dados do exame e formate seguindo exatamente este padrão:\n\n${padrao}`;
+
+            // 4. Chama o modelo multimodal gemini-2.5-flash
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [
+                    base64Data, // Passa a imagem
+                    promptUsuario // Passa o comando com o padrão
+                ],
+                config: {
+                    systemInstruction: instrucaoSistema,
+                    temperature: 0.1 // Precisão máxima
+                }
+            });
+
+            // 5. Exibe o resultado na tela
+            outputDiv.innerText = response.text;
+            outputDiv.style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            alert('Ocorreu um erro ao processar o exame: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            loadingText.style.display = 'none';
+        }
+    }
+
+    // Função auxiliar para converter o arquivo do input em base64 estruturado para a API
+    async function fileToGenerativePart(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64Part = reader.result.split(',')[1];
+                resolve({
+                    inlineData: {
+                        data: base64Part,
+                        mimeType: file.type
+                    },
+                });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+
+</body>
+</html>
