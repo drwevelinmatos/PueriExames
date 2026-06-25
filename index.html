@@ -22,7 +22,7 @@
 <body>
 
 <div class="container">
-    <h2>🔬 Extrator de Exames Laboratoriais</h2>
+    <h2>Exames Laboratoriais</h2>
     <p>Carregue o arquivo PDF completo ou selecione as várias fotos do exame ao mesmo tempo.</p>
     
     <hr>
@@ -46,7 +46,7 @@
 📝 RELATÓRIO DE EXAMES DE ROTINA [DD/MM/AAAA]
 =========================================
 
-🩸 SÉRIE VERMELHA E BRANCA (Hemograma)
+HEMOGRAMA
 - Hb: [Valor] [Unidade] 
 - Ht: [Valor] [Unidade] 
 - VCM: [Valor] [Unidade] 
@@ -54,22 +54,26 @@
 - Leuco: [Valor] [Unidade] 
 - Plaq: [Valor] [Unidade] 
 
-🔩 PERFIL DE FERRO
+PERFIL DE FERRO
 - Fe: [Valor] [Unidade] (Ref: [Referência])
 - Ferritina: [Valor] [Unidade] (Ref: [Referência])
+- Transferrina: [Valor] [Unidade] (Ref: [Referência])
 - TIBC: [Valor] [Unidade] (Ref: [Referência])
-
-💊 VITAMINAS
+- Sat Transferrina: [Valor] [Unidade] (Ref: [Referência])
+            
+VITAMINAS
 - Vitamina B12: [Valor] [Unidade] (Ref: [Referência])
 - Vitamina D: [Valor] [Unidade] (Ref: [Referência])
 - Vitamina A: [Valor] [Unidade] (Ref: [Referência])
 - Vitamina C: [Valor] [Unidade] (Ref: [Referência])
 
-🍬 PERFIL GLICÊMICO
+PERFIL GLICÊMICO
 - Glicose: [Valor] [Unidade] (Ref: [Referência])
 - HbA1c: [Valor] [Unidade] (Ref: [Referência])
-
-🥑 PERFIL LIPÍDICO
+- Insulina: [Valor] [Unidade] (Ref: [Referência])
+- HOMA: [Valor] [Unidade] (Ref: [Referência])
+            
+PERFIL LIPÍDICO
 - CT: [Valor] [Unidade] (Ref: [Referência])
 - HDL: [Valor] [Unidade] (Ref: [Referência])
 - LDL: [Valor] [Unidade] (Ref: [Referência])
@@ -77,36 +81,46 @@
 - VLDL: [Valor] [Unidade] (Ref: [Referência])
 - TG: [Valor] [Unidade] (Ref: [Referência])
 
-🦋 TIREOIDE
+TIREOIDE
 - TSH: [Valor] [Unidade] (Ref: [Referência])
+- T3: [Valor] [Unidade] (Ref: [Referência])
+- T4: [Valor] [Unidade] (Ref: [Referência])
 - T4L: [Valor] [Unidade] (Ref: [Referência])
 
-🍏 FUNÇÃO HEPÁTICA
+HEPÁTICA
 - TGO (AST): [Valor] [Unidade] (Ref: [Referência])
 - TGP (ALT): [Valor] [Unidade] (Ref: [Referência])
+- FA: [Valor] [Unidade] (Ref: [Referência])
+- GGT: [Valor] [Unidade] (Ref: [Referência])            
+- Ptn: [Valor] [Unidade] (Ref: [Referência])
+- Albumina: [Valor] [Unidade] (Ref: [Referência])
+- Globulina: [Valor] [Unidade] (Ref: [Referência])
+- Relação A/G: [Valor] [Unidade] (Ref: [Referência])
 
-💧 FUNÇÃO RENAL
+RENAL
 - Ur: [Valor] [Unidade] (Ref: [Referência])
 - Cr: [Valor] [Unidade] (Ref: [Referência])
-
-🔥 MARCADORES INFLAMATÓRIOS / ENZIMAS
+- Clearence: [Valor] [Unidade] (Ref: [Referência])
+            
+MARCADORES INFLAMATÓRIOS / ENZIMAS
 - LDH: [Valor] [Unidade] (Ref: [Referência])
 - VHS: [Valor] [Unidade] (Ref: [Referência])
 - PCR: [Valor] [Unidade] (Ref: [Referência])
 
-🧂 ELETRÓLITOS E MINERAIS
+ELETRÓLITOS E MINERAIS
 - Na: [Valor] [Unidade] (Ref: [Referência])
 - K: [Valor] [Unidade] (Ref: [Referência])
+- Ca: [Valor] [Unidade] (Ref: [Referência])
 - Cai: [Valor] [Unidade] (Ref: [Referência])
 - Zn: [Valor] [Unidade] (Ref: [Referência])
 - Mg: [Valor] [Unidade] (Ref: [Referência])
 - P: [Valor] [Unidade] (Ref: [Referência])
 - Cl: [Valor] [Unidade] (Ref: [Referência])
 
-💩 EXAME DE FEZES
+EXAME DE FEZES
 - Resultados principais: [Resumo dos achados/Parasitológico]
 
-🚽 EXAME DE URINA
+EXAME DE URINA
 - Resultados principais: [Resumo dos achados do EAS/Urina I]
 
 ➕ OUTROS EXAMES ENCONTRADOS NO LAUDO
@@ -157,10 +171,12 @@
             const instrucaoSistema = 
                 "Você é um assistente médico especialista em transcrição de laudos laboratoriais. " +
                 "Você receberá arquivos contendo várias páginas ou várias fotos do mesmo laudo. " +
-                "Sua única tarefa é extrair os dados e formatá-los rigorosamente no padrão " +
-                "enviado pelo usuário. Não invente dados e não faça comentários adicionais. " +
-                "Se o exame não estiver em nenhuma das páginas fornecidas, escreva 'Não informado'.";
-
+                "Sua tarefa tem duas partes: " +
+                "1. Extrair os dados e formatá-los rigorosamente no padrão enviado pelo usuário. " +
+                "2. Identificar OBRIGATORIAMENTE qualquer outro exame presente no documento que não " +
+                "foi listado no padrão principal, listando-os na seção 'OUTROS EXAMES ENCONTRADOS'. " +
+                "Não invente dados. Se um exame do padrão não estiver nas páginas, escreva 'Não informado'.";
+                
             const promptUsuario = `Extraia os dados dos arquivos anexos e formate seguindo exatamente este padrão:\n\n${padrao}`;
             
             // Adiciona o texto como a última parte do conteúdo a ser enviado
