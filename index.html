@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exames Laboratoriais</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-top: 0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input[type="file"] { margin-top: 5px; border: 1px dashed #3498db; padding: 15px; width: 100%; box-sizing: border-box; background: #f9fbfd; cursor: pointer; }
+        button { background-color: #3498db; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background-color 0.3s; }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        
+        /* Estilo específico para o botão de copiar */
+        #btnCopiar { background-color: #27ae60; margin-bottom: 15px; display: none; }
+        #btnCopiar:hover { background-color: #2ecc71; }
+        
+        /* Container do resultado para organizar o botão e o texto */
+        #resultadoContainer { margin-top: 30px; display: none; }
+        #output { padding: 20px; background-color: #ecf0f1; border-left: 5px solid #27ae60; border-radius: 4px; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; }
+        .loading { display: none; color: #e67e22; font-weight: bold; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Exames Laboratoriais</h2>
+    <p>Carregue o arquivo PDF completo ou selecione as várias fotos do exame ao mesmo tempo.</p>
+    
+    <hr>
+
+    <div class="form-group">
+        <label for="apiKey">Sua API Key do Google AI Studio:</label>
+        <input type="text" id="apiKey" placeholder="Cole sua API Key aqui...">
+    </div>
+
+    <div class="form-group">
+        <label for="exameFile">Selecione o Exame (PDF ou Múltiplas Fotos):</label>
+        <input type="file" id="exameFile" accept="image/*, application/pdf" multiple>
+        <small style="color: #7f8c8d;">Pressione CTRL (ou Command) para selecionar várias fotos de uma vez, ou escolha um PDF.</small>
+    </div>
+
+    <button id="btnProcessar" onclick="processarExame()">Processar Exames</button>
+    <div id="loadingText" class="loading">⏳ Lendo as páginas e formatando os dados... Aguarde...</div>
+
+    <div id="resultadoContainer">
+        <button id="btnCopiar" onclick="copiarResultado()">📋 Copiar para o Prontuário</button>
+        <div id="output"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { GoogleGenAI } from 'https://esm.run/@google/genai';
+
+    const PADRAO_EXAMES = `
+=========================================
+📝 RELATÓRIO DE EXAMES DE ROTINA
+=========================================
+
+🩸 SÉRIE VERMELHA E BRANCA (Hemograma)
+- Hb (Hemoglobina): [Valor] [Unidade] (Ref: [Referência])
+- Ht (Hematócrito): [Valor] [Unidade] (Ref: [Referência])
+- VCM: [Valor] [Unidade] (Ref: [Referência])
+- HCM: [Valor] [Unidade] (Ref: [Referência])
+- Leuco (Leucócitos): [Valor] [Unidade] (Ref: [Referência])
+- Plaq (Plaquetas): [Valor] [Unidade] (Ref: [Referência])
+
+🔩 PERFIL DE FERRO
+- Fe (Ferro Sérico): [Valor] [Unidade] (Ref: [Referência])
+- Ferritina: [Valor] [Unidade] (Ref: [Referência])
+- TIBC (Capacidade de Ligação do Ferro): [Valor] [Unidade] (Ref: [Referência])
+
+💊 VITAMINAS
+- Vitamina B12: [Valor] [Unidade] (Ref: [Referência])
+- Vitamina D: [Valor] [Unidade] (Ref: [Referência])
+- Vitamina A: [Valor] [Unidade] (Ref: [Referência])
+- Vitamina C: [Valor] [Unidade] (Ref: [Referência])
+
+🍬 PERFIL GLICÊMICO
+- Glic (Glicemia de Jejum): [Valor] [Unidade] (Ref: [Referência])
+- HbA1c (Hemoglobina Glicada): [Valor] [Unidade] (Ref: [Referência])
+
+🥑 PERFIL LIPÍDICO
+- CT (Colesterol Total): [Valor] [Unidade] (Ref: [Referência])
+- HDL: [Valor] [Unidade] (Ref: [Referência])
+- LDL: [Valor] [Unidade] (Ref: [Referência])
+- Não-HDL: [Valor] [Unidade] (Ref: [Referência])
+- VLDL: [Valor] [Unidade] (Ref: [Referência])
+- TG (Triglicerídeos): [Valor] [Unidade] (Ref: [Referência])
+
+🦋 TIREOIDE
+- TSH: [Valor] [Unidade] (Ref: [Referência])
+- T4L (T4 Livre): [Valor] [Unidade] (Ref: [Referência])
+
+🍏 FUNÇÃO HEPÁTICA
+- TGO (AST): [Valor] [Unidade] (Ref: [Referência])
+- TGP (ALT): [Valor] [Unidade] (Ref: [Referência])
+
+💧 FUNÇÃO RENAL
+- Ur (Ureia): [Valor] [Unidade] (Ref: [Referência])
+- Cr (Creatinina): [Valor] [Unidade] (Ref: [Referência])
+
+🔥 MARCADORES INFLAMATÓRIOS / ENZIMAS
+- LDH (Desidrogenase Lática): [Valor] [Unidade] (Ref: [Referência])
+- VHS (Velocidade de Hemossedimentação): [Valor] [Unidade] (Ref: [Referência])
+- PCR (Proteína C Reativa): [Valor] [Unidade] (Ref: [Referência])
+
+🧂 ELETRÓLITOS E MINERAIS
+- Na (Sódio): [Valor] [Unidade] (Ref: [Referência])
+- K (Potássio): [Valor] [Unidade] (Ref: [Referência])
+- Cai (Cálcio Iônico): [Valor] [Unidade] (Ref: [Referência])
+- Zn (Zinco): [Valor] [Unidade] (Ref: [Referência])
+- Mg (Magnésio): [Valor] [Unidade] (Ref: [Referência])
+- P (Fósforo): [Valor] [Unidade] (Ref: [Referência])
+- Cl (Cloro): [Valor] [Unidade] (Ref: [Referência])
+
+💩 EXAME DE FEZES
+- Resultados principais: [Resumo dos achados/Parasitológico]
+
+🚽 EXAME DE URINA
+- Resultados principais: [Resumo dos achados do EAS/Urina I]
+
+=========================================
+➕ OUTROS EXAMES ENCONTRADOS NO LAUDO
+=========================================
+(Liste abaixo qualquer outro exame presente no documento que não tenha sido solicitado no padrão acima. Use o formato: "- [Nome do Exame]: [Valor] [Unidade] (Ref: [Referência])". Se não houver nenhum exame extra, escreva "Nenhum exame adicional encontrado".)
+    `;
+
+    window.processarExame = async function() {
+        const apiKey = document.getElementById('apiKey').value.trim();
+        const fileInput = document.getElementById('exameFile');
+        const outputDiv = document.getElementById('output');
+        const resultadoContainer = document.getElementById('resultadoContainer');
+        const loadingText = document.getElementById('loadingText');
+        const btnProcessar = document.getElementById('btnProcessar');
+        const btnCopiar = document.getElementById('btnCopiar');
+
+        if (!apiKey) { alert('Por favor, insira sua API Key.'); return; }
+        if (fileInput.files.length === 0) { alert('Por favor, selecione os arquivos do exame.'); return; }
+
+        try {
+            btnProcessar.disabled = true;
+            loadingText.style.display = 'block';
+            resultadoContainer.style.display = 'none';
+            btnCopiar.style.display = 'none'; // Esconde o botão de copiar ao iniciar nova busca
+
+            const ai = new GoogleGenAI({ apiKey: apiKey });
+            const conteudosParaEnviar = [];
+            
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                const base64Data = await fileToGenerativePart(file);
+                conteudosParaEnviar.push(base64Data);
+            }
+
+            const instrucaoSistema = 
+                "Você é um assistente médico especialista em transcrição de laudos laboratoriais. " +
+                "Você receberá arquivos contendo várias páginas ou várias fotos do mesmo laudo. " +
+                "Sua tarefa tem duas partes: " +
+                "1. Extrair os dados e formatá-los rigorosamente no padrão enviado pelo usuário. " +
+                "2. Identificar OBRIGATORIAMENTE qualquer outro exame presente no documento que não " +
+                "foi listado no padrão principal, listando-os na seção 'OUTROS EXAMES ENCONTRADOS'. " +
+                "Não invente dados. Se um exame do padrão não estiver nas páginas, escreva 'Não informado'.";
+
+            const promptUsuario = `Extraia os dados dos arquivos anexos e formate seguindo exatamente este padrão:\n\n${PADRAO_EXAMES}`;
+            
+            conteudosParaEnviar.push(promptUsuario);
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: conteudosParaEnviar,
+                config: {
+                    systemInstruction: instrucaoSistema,
+                    temperature: 0.1
+                }
+            });
+
+            outputDiv.innerText = response.text;
+            resultadoContainer.style.display = 'block';
+            btnCopiar.style.display = 'block'; // Mostra o botão de copiar após gerar o resultado
+
+        } catch (error) {
+            console.error(error);
+            alert('Ocorreu um erro ao processar o exame: ' + error.message);
+        } finally {
+            btnProcessar.disabled = false;
+            loadingText.style.display = 'none';
+        }
+    }
+
+    // Nova função para copiar o texto para a área de transferência
+    window.copiarResultado = async function() {
+        const textoParaCopiar = document.getElementById('output').innerText;
+        const btnCopiar = document.getElementById('btnCopiar');
+        
+        try {
+            await navigator.clipboard.writeText(textoParaCopiar);
+            
+            // Feedback visual no botão
+            const textoOriginal = btnCopiar.innerText;
+            btnCopiar.innerText = '✅ Copiado com sucesso!';
+            btnCopiar.style.backgroundColor = '#2ecc71'; // Verde mais claro
+            
+            // Retorna ao estado original após 2,5 segundos
+            setTimeout(() => {
+                btnCopiar.innerText = textoOriginal;
+                btnCopiar.style.backgroundColor = '#27ae60'; // Verde original
+            }, 2500);
+            
+        } catch (err) {
+            console.error('Falha ao copiar:', err);
+            alert('Não foi possível copiar o texto automaticamente. Por favor, selecione e copie manualmente.');
+        }
+    }
+
+    async function fileToGenerativePart(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64Part = reader.result.split(',')[1];
+                resolve({
+                    inlineData: {
+                        data: base64Part,
+                        mimeType: file.type
+                    },
+                });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+
+</body>
+</html>
