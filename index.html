@@ -58,77 +58,91 @@
     import { GoogleGenAI } from 'https://esm.run/@google/genai';
 
     const PADRAO_EXAMES = `
-=========================================
-📝 RELATÓRIO DE EXAMES DE ROTINA
-=========================================
+EXAMES LABORATORIAIS ([DD/MM/AAAA])
 
-🩸 SÉRIE VERMELHA E BRANCA (Hemograma)
-- Hb (Hemoglobina): [Valor] [Unidade] (Ref: [Referência])
-- Ht (Hematócrito): [Valor] [Unidade] (Ref: [Referência])
-- VCM: [Valor] [Unidade] (Ref: [Referência])
-- HCM: [Valor] [Unidade] (Ref: [Referência])
-- Leuco (Leucócitos): [Valor] [Unidade] (Ref: [Referência])
-- Plaq (Plaquetas): [Valor] [Unidade] (Ref: [Referência])
+HEMOGRAMA
+- Hb: [Valor] [Unidade] 
+- Ht: [Valor] [Unidade] 
+- VCM: [Valor] [Unidade] 
+- HCM: [Valor] [Unidade] 
+- Leuco: [Valor] [Unidade] 
+- Plaq: [Valor] [Unidade] 
 
-🔩 PERFIL DE FERRO
-- Fe (Ferro Sérico): [Valor] [Unidade] (Ref: [Referência])
-- Ferritina: [Valor] [Unidade] (Ref: [Referência])
-- TIBC (Capacidade de Ligação do Ferro): [Valor] [Unidade] (Ref: [Referência])
+PERFIL DE FERRO
+- Fe: [Valor] [Unidade] (Ref: 50–120 µg/dL)
+- Ferritina: [Valor] [Unidade] (Ref: 12–150 ng/mL)
+- Transferrina: [Valor] [Unidade] (Ref: 200–360 mg/dL)
+- TIBC: [Valor] [Unidade] (Ref: 250–450 µg/dL)
+- Sat Transferrina: [Valor] [Unidade] (Ref: 20–50%)
+            
+VITAMINAS
+- Vitamina B12: [Valor] [Unidade] (Ref: 200–900 pg/mL)
+- Vitamina D: [Valor] [Unidade] (Ref: 30-60 ng/mL)
+- Vitamina A: [Valor] [Unidade] (Ref: 20–60 µg/dL)
+- Vitamina C: [Valor] [Unidade] (Ref: 0,4–2,0 mg/dL)
 
-💊 VITAMINAS
-- Vitamina B12: [Valor] [Unidade] (Ref: [Referência])
-- Vitamina D: [Valor] [Unidade] (Ref: [Referência])
-- Vitamina A: [Valor] [Unidade] (Ref: [Referência])
-- Vitamina C: [Valor] [Unidade] (Ref: [Referência])
+PERFIL GLICÊMICO
+- Glicose: [Valor] [Unidade] (Ref: 70–99 mg/dL)
+- HbA1c: [Valor] [Unidade] (Ref: <5,7%)
+- Glic Média: [Valor] [Unidade] (Ref: 70–99 mg/dL)
+- Insulina: [Valor] [Unidade] (Ref: 2–15 μUI/mL)
+- HOMA: [Valor] [Unidade] (Ref: Pré-púbere <2 / Puberdade até 3,2)
+            
+PERFIL LIPÍDICO
+- CT: [Valor] [Unidade] (Ref: Desejável <170 mg/dL / Limítrofe 170–199 mg/dL / Alto ≥200 mg/dL)
+- HDL: [Valor] [Unidade] (Ref: Desejável >45 mg/dL / Baixo <40 mg/dL)
+- LDL: [Valor] [Unidade] (Ref: Desejável <110 mg/dL / Limítrofe 110-129 mg/dL / Alto ≥130 mg/dL)
+- Não-HDL: [Valor] [Unidade] (Ref: Desejável <120 mg/dL / Limítrofe 120-144 mg/dL / Alto ≥145 mg/dL)
+- VLDL: [Valor] [Unidade] (Ref: 5–40 mg/dL)
+- TG: [Valor] [Unidade] (Ref: <10 anos: Desejável <75 mg/dL / Limítrofe 75-99 mg/dL / Alto ≥100 mg/dL - >10 anos: Desejável <90 mg/dL / Limítrofe 90-129 mg/dL / Alto ≥130 mg/dL
 
-🍬 PERFIL GLICÊMICO
-- Glic (Glicemia de Jejum): [Valor] [Unidade] (Ref: [Referência])
-- HbA1c (Hemoglobina Glicada): [Valor] [Unidade] (Ref: [Referência])
+TIREOIDE
+- TSH: [Valor] [Unidade] (Ref: 0,7–6,0 mUI/L)
+- T3: [Valor] [Unidade] (Ref: 80–220 ng/dL)
+- T4: [Valor] [Unidade] (Ref: 5–12 µg/dL)
+- T4L: [Valor] [Unidade] (Ref: 0,8–2,2 ng/dL)
 
-🥑 PERFIL LIPÍDICO
-- CT (Colesterol Total): [Valor] [Unidade] (Ref: [Referência])
-- HDL: [Valor] [Unidade] (Ref: [Referência])
-- LDL: [Valor] [Unidade] (Ref: [Referência])
-- Não-HDL: [Valor] [Unidade] (Ref: [Referência])
-- VLDL: [Valor] [Unidade] (Ref: [Referência])
-- TG (Triglicerídeos): [Valor] [Unidade] (Ref: [Referência])
+HEPÁTICA
+- TGO (AST): [Valor] [Unidade] (Ref: 15–50 U/L)
+- TGP (ALT): [Valor] [Unidade] (Ref: 10–45 U/L)
+- FA: [Valor] [Unidade] (Ref: RN 150–600 / Infância 150–450 / Puberdade até 900)
+- GGT: [Valor] [Unidade] (Ref: 5–35 U/L)            
+- Ptn: [Valor] [Unidade] (Ref: 6,0–8,0 g/dL)
+- Albumina: [Valor] [Unidade] (Ref: 3,5–5,0 g/dL)
+- Globulina: [Valor] [Unidade] (Ref: 2,0–3,5 g/dL)
+- Relação A/G: [Valor] [Unidade] (Ref: 1,0–2,2)
 
-🦋 TIREOIDE
-- TSH: [Valor] [Unidade] (Ref: [Referência])
-- T4L (T4 Livre): [Valor] [Unidade] (Ref: [Referência])
+RENAL
+- Ur: [Valor] [Unidade] (Ref: 10–40 mg/dL)
+- Cr: [Valor] [Unidade] (Ref: RN 0,6–1,2 / 6 meses 0,2–0,4 / 1–5 anos 0,3–0,6 / 6–12 anos 0,4–0,8 / Adolescente 0,5–1,0)
+- Clearence: [Valor] [Unidade] (Ref: 90 mL/min/1,73m²)
+            
+MARCADORES INFLAMATÓRIOS / ENZIMAS
+- LDH: [Valor] [Unidade] (Ref: 120–300 U/L)
+- VHS: [Valor] [Unidade] (Ref: Criança até 10 mm/h / Adolescente até 20mm/h)
+- PCR: [Valor] [Unidade] (Ref: [Referência])
 
-🍏 FUNÇÃO HEPÁTICA
-- TGO (AST): [Valor] [Unidade] (Ref: [Referência])
-- TGP (ALT): [Valor] [Unidade] (Ref: [Referência])
+ELETRÓLITOS E MINERAIS
+- Na: [Valor] [Unidade] (Ref: 135–145)
+- K: [Valor] [Unidade] (Ref: 3,5–5,5)
+- Ca: [Valor] [Unidade] (Ref: 8,8–10,8)
+- Cai: [Valor] [Unidade] (Ref: 1,12–1,32 mmol/L)
+- Zn: [Valor] [Unidade] (Ref: 70–120 µg/dL)
+- Mg: [Valor] [Unidade] (Ref: 1,7–2,4 mg/dL)
+- P: [Valor] [Unidade] (Ref: Lactentes 4–7 mg/dL / Crianças maiores 3–5,5 mg/dL)
+- Cl: [Valor] [Unidade] (Ref: 98–107)
 
-💧 FUNÇÃO RENAL
-- Ur (Ureia): [Valor] [Unidade] (Ref: [Referência])
-- Cr (Creatinina): [Valor] [Unidade] (Ref: [Referência])
-
-🔥 MARCADORES INFLAMATÓRIOS / ENZIMAS
-- LDH (Desidrogenase Lática): [Valor] [Unidade] (Ref: [Referência])
-- VHS (Velocidade de Hemossedimentação): [Valor] [Unidade] (Ref: [Referência])
-- PCR (Proteína C Reativa): [Valor] [Unidade] (Ref: [Referência])
-
-🧂 ELETRÓLITOS E MINERAIS
-- Na (Sódio): [Valor] [Unidade] (Ref: [Referência])
-- K (Potássio): [Valor] [Unidade] (Ref: [Referência])
-- Cai (Cálcio Iônico): [Valor] [Unidade] (Ref: [Referência])
-- Zn (Zinco): [Valor] [Unidade] (Ref: [Referência])
-- Mg (Magnésio): [Valor] [Unidade] (Ref: [Referência])
-- P (Fósforo): [Valor] [Unidade] (Ref: [Referência])
-- Cl (Cloro): [Valor] [Unidade] (Ref: [Referência])
-
-💩 EXAME DE FEZES
+EXAME DE FEZES
 - Resultados principais: [Resumo dos achados/Parasitológico]
 
-🚽 EXAME DE URINA
+EXAME DE URINA
 - Resultados principais: [Resumo dos achados do EAS/Urina I]
 
-=========================================
 ➕ OUTROS EXAMES ENCONTRADOS NO LAUDO
-=========================================
 (Liste abaixo qualquer outro exame presente no documento que não tenha sido solicitado no padrão acima. Use o formato: "- [Nome do Exame]: [Valor] [Unidade] (Ref: [Referência])". Se não houver nenhum exame extra, escreva "Nenhum exame adicional encontrado".)
+
+-----------------------------------------
+⚠️ OBSERVAÇÃO: Os exames não encontrados na folha enviada foram marcados como "Não informado".
     `;
 
     window.processarExame = async function() {
